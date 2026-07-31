@@ -24,7 +24,7 @@
   <span id="net" class="badge">Verificando…</span>
   <button id="cerrarSesion" class="logout-btn" type="button">Cerrar sesión</button>
 </div></header>
-<nav><button data-tab="datos" class="active">1. Datos</button><button data-tab="checklist">2. Checklist</button><button data-tab="resumen">3. Resumen/PDF</button></nav>
+<nav><button data-tab="datos" class="active">1. Datos</button><button data-tab="checklist">2. Checklist</button><button data-tab="resumen">3. Resumen/PDF</button><button data-tab="historial">4. Historial</button></nav>
 <main>
 <section id="datos" class="tab active">
 <div class="card"><h2>Datos generales</h2><div class="grid general-grid">
@@ -45,5 +45,27 @@
 </tbody></table></div>
 <div class="actions"><button id="guardarDatos" class="primary">Guardar y continuar</button><button id="nuevo" class="danger">Nueva auditoría</button></div></div></section>
 <section id="checklist" class="tab"><div class="toolbar"><input id="buscar" placeholder="Buscar ítem, detalle o criterio"><select id="filtro"><option value="">Todos</option><option>CUMPLE</option><option>NO CUMPLE</option><option>NO APLICA</option><option value="PENDIENTE">Pendientes</option></select><span id="avance"></span></div><div id="lista"></div></section>
-<section id="resumen" class="tab"><div class="card"><div class="report-title"><div><h2>Informe de auditoría</h2><p>Check List de Crianza de Pollos Convencional</p></div><img src="logo-santa-elena.png" alt="Santa Elena" class="report-logo"></div><div id="resumenDatos"></div><div class="kpis"><div><b id="pct">0%</b><span>Cumplimiento</span></div><div><b id="cumple">0</b><span>Cumple</span></div><div><b id="nocumple">0</b><span>No cumple</span></div><div><b id="pendientes">0</b><span>Pendientes</span></div></div><div id="desviaciones"></div><div class="actions"><button id="imprimir" class="primary">Descargar / imprimir PDF</button><button id="exportar">Exportar respaldo</button><label class="filebtn">Importar respaldo<input id="importar" type="file" accept="application/json"></label><button id="correo">Preparar correo</button></div><p class="note">Los datos y fotos se guardan localmente. Use “Exportar respaldo” para evitar pérdidas.</p></div></section>
+<section id="resumen" class="tab"><div class="card"><div class="report-title"><div><h2>Informe de auditoría</h2><p>Check List de Crianza de Pollos Convencional</p></div><img src="logo-santa-elena.png" alt="Santa Elena" class="report-logo"></div><div id="resumenDatos"></div><div class="kpis"><div><b id="pct">0%</b><span>Cumplimiento</span></div><div><b id="cumple">0</b><span>Cumple</span></div><div><b id="nocumple">0</b><span>No cumple</span></div><div><b id="pendientes">0</b><span>Pendientes</span></div></div><div id="desviaciones"></div><div class="actions"><button id="guardarHistorial" class="primary">Guardar auditoría en historial</button><button id="imprimir" class="primary">Descargar / imprimir PDF</button><button id="exportar">Exportar respaldo</button><label class="filebtn">Importar respaldo<input id="importar" type="file" accept="application/json"></label><button id="correo">Preparar correo</button><button id="marcarEnviada">Marcar como enviada</button></div><p class="note">Los datos y fotos se guardan localmente. Use “Exportar respaldo” para evitar pérdidas.</p></div></section>
+
+<section id="historial" class="tab">
+  <div class="card">
+    <div class="history-head">
+      <div>
+        <h2>Historial de auditorías</h2>
+        <p class="note">Todos los usuarios pueden visualizar y descargar los informes. Solo el auditor responsable o el administrador pueden editar una auditoría guardada.</p>
+      </div>
+      <button id="actualizarHistorial" type="button">Actualizar historial</button>
+    </div>
+    <div class="toolbar history-toolbar">
+      <input id="buscarHistorial" placeholder="Buscar por granja, auditor, campaña, visita o fecha">
+      <select id="filtroHistorialEstado">
+        <option value="">Todos los estados</option>
+        <option value="GUARDADA">Guardada</option>
+        <option value="ENVIADA">Enviada</option>
+      </select>
+    </div>
+    <div id="listaHistorial"></div>
+  </div>
+</section>
+
 </main><footer>Aplicativo editable de auditoría de crianza convencional.</footer></div><script src="app.js"></script></body></html>

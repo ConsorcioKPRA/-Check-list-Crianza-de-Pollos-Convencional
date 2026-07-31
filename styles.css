@@ -23,3 +23,18 @@
 .logout-btn{background:#fff1;color:white;border-color:#ffffff66;padding:8px 11px}
 @media(max-width:700px){.header-actions{width:100%}.user-badge{flex:1}.logout-btn{margin-left:auto}}
 @media print{.user-badge,.logout-btn{display:none!important}}
+
+
+/* Historial y permisos V7 */
+.history-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.history-toolbar{grid-template-columns:1fr 220px}
+.history-card{border:1px solid #d8e3de;border-radius:12px;padding:15px;margin:12px 0;background:#fff}
+.history-main{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.history-main h3{margin:0 0 8px}
+.history-main p{margin:5px 0;color:#445}
+.history-status{background:#fff0bf;color:#6c4b00;padding:7px 10px;border-radius:999px;font-weight:700;font-size:12px}
+.history-status.sent{background:#d8f1e4;color:#145c3d}
+.history-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.empty-history{padding:24px;text-align:center;background:#f5f8f6;border-radius:12px;color:#667}
+button:disabled,input:disabled,select:disabled,textarea:disabled{opacity:.65;cursor:not-allowed}
+@media(max-width:700px){.history-head,.history-main{flex-direction:column}.history-toolbar{grid-template-columns:1fr}}

@@ -189,3 +189,270 @@ if (sesionGuardada && USUARIOS[sesionGuardada.usuario]) {
 }
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+
+
+/* ===== V7: permisos, historial y bloqueo por auditor ===== */
+const HISTORY_KEY = 'historial-auditorias-v7';
+const CURRENT_AUDIT_ID_KEY = 'auditoria-actual-id-v7';
+
+function getCurrentUser() {
+  if (typeof sesionActual !== 'undefined' && sesionActual) return sesionActual;
+  const raw = sessionStorage.getItem('sesion-auditoria-crianza-v1');
+  return raw ? JSON.parse(raw) : null;
+}
+
+function currentUsername() {
+  const u = getCurrentUser();
+  return u ? String(u.usuario || '').toLowerCase() : '';
+}
+
+function currentRole() {
+  const u = getCurrentUser();
+  return u ? String(u.rol || 'AUDITOR').toUpperCase() : 'AUDITOR';
+}
+
+function currentAuditorName() {
+  const u = getCurrentUser();
+  return u ? String(u.auditor || '') : '';
+}
+
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(items) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(items));
+}
+
+function auditId() {
+  let id = localStorage.getItem(CURRENT_AUDIT_ID_KEY);
+  if (!id) {
+    id = 'AUD-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+    localStorage.setItem(CURRENT_AUDIT_ID_KEY, id);
+  }
+  return id;
+}
+
+function canEditAudit(record) {
+  if (!record) return true;
+  if (currentRole() === 'ADMIN') return true;
+  return String(record.auditorUsuario || '').toLowerCase() === currentUsername();
+}
+
+function isCurrentAuditLocked() {
+  const id = localStorage.getItem(CURRENT_AUDIT_ID_KEY);
+  if (!id) return false;
+  const record = getHistory().find(x => x.id === id);
+  if (!record) return false;
+  if (!['GUARDADA', 'ENVIADA'].includes(record.estado)) return false;
+  return !canEditAudit(record);
+}
+
+function setEditingEnabled(enabled) {
+  document.querySelectorAll('#datos input, #datos select, #checklist input, #checklist select, #checklist textarea, #checklist button')
+    .forEach(el => {
+      if (el.id === 'buscar' || el.id === 'filtro') return;
+      el.disabled = !enabled;
+    });
+
+  const saveBtn = document.getElementById('guardarHistorial');
+  const sentBtn = document.getElementById('marcarEnviada');
+  if (saveBtn) saveBtn.disabled = !enabled;
+  if (sentBtn) sentBtn.disabled = !enabled;
+}
+
+function buildHistoryRecord(existingState = state) {
+  const user = getCurrentUser();
+  const gs = typeof activeGalpones === 'function' ? activeGalpones() : [];
+  const s = typeof stats === 'function' ? stats() : {pct: 0};
+
+  return {
+    id: auditId(),
+    fecha: existingState.datos?.fecha || '',
+    granja: existingState.datos?.granja || '',
+    supervisor: existingState.datos?.supervisor || '',
+    campana: existingState.datos?.campana || '',
+    visita: existingState.datos?.visita || '',
+    auditor: existingState.datos?.auditor || currentAuditorName(),
+    auditorUsuario: user?.usuario || '',
+    rolCreador: user?.rol || 'AUDITOR',
+    galpones: JSON.parse(JSON.stringify(existingState.galpones || [])),
+    respuestas: JSON.parse(JSON.stringify(existingState.respuestas || {})),
+    porcentaje: Number(s.pct || 0),
+    estado: 'GUARDADA',
+    creadoEn: new Date().toISOString(),
+    actualizadoEn: new Date().toISOString()
+  };
+}
+
+function guardarAuditoriaHistorial() {
+  if (typeof validateDatos === 'function' && !validateDatos()) return;
+
+  const items = getHistory();
+  const id = auditId();
+  const existingIndex = items.findIndex(x => x.id === id);
+  const existing = existingIndex >= 0 ? items[existingIndex] : null;
+
+  if (existing && !canEditAudit(existing)) {
+    alert('Esta auditoría solo puede ser modificada por el auditor responsable o por el administrador.');
+    return;
+  }
+
+  const record = buildHistoryRecord();
+  if (existing) {
+    record.creadoEn = existing.creadoEn;
+    record.estado = existing.estado || 'GUARDADA';
+    record.actualizadoEn = new Date().toISOString();
+    items[existingIndex] = record;
+  } else {
+    items.unshift(record);
+  }
+
+  saveHistory(items);
+  alert('Auditoría guardada correctamente en el historial.');
+  renderHistory();
+}
+
+function marcarAuditoriaEnviada() {
+  const items = getHistory();
+  const id = auditId();
+  const idx = items.findIndex(x => x.id === id);
+
+  if (idx < 0) {
+    guardarAuditoriaHistorial();
+    return marcarAuditoriaEnviada();
+  }
+
+  if (!canEditAudit(items[idx])) {
+    alert('Solo el auditor responsable o el administrador pueden cambiar el estado de esta auditoría.');
+    return;
+  }
+
+  items[idx].estado = 'ENVIADA';
+  items[idx].enviadaEn = new Date().toISOString();
+  items[idx].actualizadoEn = new Date().toISOString();
+  saveHistory(items);
+  alert('La auditoría fue marcada como enviada y quedó bloqueada para otros usuarios.');
+  renderHistory();
+}
+
+function loadAuditFromHistory(id, editMode) {
+  const record = getHistory().find(x => x.id === id);
+  if (!record) {
+    alert('No se encontró la auditoría.');
+    return;
+  }
+
+  if (editMode && !canEditAudit(record)) {
+    alert('Solo el auditor responsable o el administrador pueden editar esta auditoría.');
+    return;
+  }
+
+  state = {
+    datos: JSON.parse(JSON.stringify(record.datos || {
+      fecha: record.fecha || '',
+      granja: record.granja || '',
+      supervisor: record.supervisor || '',
+      campana: record.campana || '',
+      visita: record.visita || '',
+      auditor: record.auditor || ''
+    })),
+    galpones: JSON.parse(JSON.stringify(record.galpones || [])),
+    respuestas: JSON.parse(JSON.stringify(record.respuestas || {}))
+  };
+
+  while (state.galpones.length < 3) state.galpones.push(EMPTY_GALPON());
+  localStorage.setItem(KEY, JSON.stringify(state));
+  localStorage.setItem(CURRENT_AUDIT_ID_KEY, record.id);
+
+  if (typeof loadDatos === 'function') loadDatos();
+  if (typeof renderList === 'function') renderList();
+  if (typeof renderSummary === 'function') renderSummary();
+
+  setEditingEnabled(editMode && canEditAudit(record));
+  if (typeof tab === 'function') tab(editMode ? 'datos' : 'resumen');
+}
+
+function downloadAuditPdf(id) {
+  const record = getHistory().find(x => x.id === id);
+  if (!record) return;
+
+  // Load the historical audit in read-only mode, then print.
+  loadAuditFromHistory(id, false);
+  setTimeout(() => window.print(), 300);
+}
+
+function renderHistory() {
+  const container = document.getElementById('listaHistorial');
+  if (!container) return;
+
+  const query = (document.getElementById('buscarHistorial')?.value || '').toLowerCase();
+  const status = document.getElementById('filtroHistorialEstado')?.value || '';
+
+  const items = getHistory().filter(r => {
+    const text = [
+      r.fecha, r.granja, r.supervisor, r.campana, r.visita,
+      r.auditor, r.estado, (r.galpones || []).map(g => g.numero).join(' ')
+    ].join(' ').toLowerCase();
+
+    return (!query || text.includes(query)) && (!status || r.estado === status);
+  });
+
+  if (!items.length) {
+    container.innerHTML = '<div class="empty-history">No hay auditorías guardadas en este dispositivo.</div>';
+    return;
+  }
+
+  container.innerHTML = items.map(r => {
+    const editable = canEditAudit(r);
+    const galpones = (r.galpones || []).filter(g => g.numero).map(g => `Galpón ${esc(g.numero)}`).join(', ');
+    return `
+      <article class="history-card">
+        <div class="history-main">
+          <div>
+            <h3>${esc(r.granja || 'Sin granja')} · ${esc(r.fecha || '')}</h3>
+            <p><b>Auditor(a):</b> ${esc(r.auditor || '')} · <b>Campaña:</b> ${esc(r.campana || '')} · <b>Visita:</b> ${esc(r.visita || '')}</p>
+            <p><b>Galpones:</b> ${galpones || 'Sin datos'} · <b>Resultado:</b> ${Number(r.porcentaje || 0).toFixed(1)}%</p>
+          </div>
+          <span class="history-status ${r.estado === 'ENVIADA' ? 'sent' : ''}">${esc(r.estado || 'GUARDADA')}</span>
+        </div>
+        <div class="history-actions">
+          <button type="button" onclick="loadAuditFromHistory('${r.id}', false)">Ver</button>
+          ${editable ? `<button type="button" onclick="loadAuditFromHistory('${r.id}', true)">Editar</button>` : ''}
+          <button type="button" onclick="downloadAuditPdf('${r.id}')">Descargar PDF</button>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+function resetCurrentAuditId() {
+  localStorage.removeItem(CURRENT_AUDIT_ID_KEY);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const saveBtn = document.getElementById('guardarHistorial');
+  if (saveBtn) saveBtn.addEventListener('click', guardarAuditoriaHistorial);
+
+  const sentBtn = document.getElementById('marcarEnviada');
+  if (sentBtn) sentBtn.addEventListener('click', marcarAuditoriaEnviada);
+
+  document.getElementById('actualizarHistorial')?.addEventListener('click', renderHistory);
+  document.getElementById('buscarHistorial')?.addEventListener('input', renderHistory);
+  document.getElementById('filtroHistorialEstado')?.addEventListener('change', renderHistory);
+
+  const newBtn = document.getElementById('nuevo');
+  if (newBtn) {
+    const previous = newBtn.onclick;
+    newBtn.onclick = () => {
+      resetCurrentAuditId();
+      if (typeof previous === 'function') previous();
+    };
+  }
+
+  renderHistory();
+});
