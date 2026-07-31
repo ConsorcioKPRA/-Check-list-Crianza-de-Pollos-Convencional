@@ -73,3 +73,45 @@ button:disabled,input:disabled,select:disabled,textarea:disabled{opacity:.65;cur
 .landing-btn{width:100%;padding:15px 18px;font-size:16px}
 .landing-btn.secondary{background:white;color:#0f4c3a;border:2px solid #137a57}
 .login-cancel{width:100%;margin-top:10px}
+
+
+/* V10: resultados por galpón */
+.final-result-card{
+  margin:22px 0;padding:18px;border:1px solid #d6e2dc;
+  border-radius:14px;background:#fbfdfc
+}
+.final-result-card h3{margin-top:0}
+.result-table-wrap{overflow-x:auto}
+.result-table{
+  width:100%;border-collapse:collapse;min-width:760px;background:white
+}
+.result-table th,.result-table td{
+  border:1px solid #d7e0dc;padding:10px;text-align:center
+}
+.result-table thead th{background:#eaf3ef}
+.result-table tbody td:first-child{text-align:left}
+.average-result{
+  margin-top:18px;padding:18px;border-radius:14px;text-align:center;border:2px solid
+}
+.average-number{font-size:36px;font-weight:800}
+.average-state{font-size:22px;font-weight:800;margin-top:4px}
+.average-meta{font-size:13px;margin-top:6px}
+.average-result.good{background:#e3f5ea;border-color:#2a8b57;color:#145c3d}
+.average-result.regular{background:#fff5cf;border-color:#d8a800;color:#735b00}
+.average-result.improve{background:#ffe4e4;border-color:#c73535;color:#8a1717}
+.audit-message{
+  margin-top:14px;padding:16px;border-radius:12px;border-left:5px solid
+}
+.audit-message h4{margin:0 0 8px}
+.audit-message p{margin:0;line-height:1.5}
+.audit-message.good{background:#f0faf4;border-color:#2a8b57}
+.audit-message.regular{background:#fff9df;border-color:#d8a800}
+.audit-message.improve{background:#fff0f0;border-color:#c73535}
+.summary-classification{
+  margin-top:12px;padding:10px;border-radius:8px;background:#eef5f1
+}
+.history-classification{margin-top:6px}
+@media print{
+  .final-result-card{break-inside:avoid;border:1px solid #999}
+  .average-number{font-size:28px}
+}

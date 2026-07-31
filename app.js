@@ -590,3 +590,231 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setTimeout(showLanding, 0);
 });
+
+
+/* ===== V10: cálculo por galpón, promedio final y clasificación ===== */
+const META_CUMPLIMIENTO = 94;
+
+function statsPorGalpon() {
+  const gs = activeGalpones();
+
+  return gs.map(g => {
+    let cumple = 0;
+    let noCumple = 0;
+    let noAplica = 0;
+    let pendiente = 0;
+
+    REQS.forEach(x => {
+      const resultado = getResp(x.item, g.index).resultado;
+
+      if (resultado === 'CUMPLE') cumple++;
+      else if (resultado === 'NO CUMPLE') noCumple++;
+      else if (resultado === 'NO APLICA') noAplica++;
+      else pendiente++;
+    });
+
+    const evaluados = cumple + noCumple;
+    const porcentaje = evaluados > 0 ? (cumple / evaluados) * 100 : 0;
+
+    return {
+      index: g.index,
+      numero: g.numero,
+      cumple,
+      noCumple,
+      noAplica,
+      pendiente,
+      evaluados,
+      porcentaje
+    };
+  });
+}
+
+function promedioFinalGalpones() {
+  const resultados = statsPorGalpon().filter(g => g.evaluados > 0);
+
+  if (!resultados.length) return 0;
+
+  return resultados.reduce((sum, g) => sum + g.porcentaje, 0) / resultados.length;
+}
+
+function clasificarResultado(porcentaje) {
+  if (porcentaje >= 94) {
+    return {
+      estado: 'BUENO',
+      clase: 'good',
+      mensaje:
+        `¡Excelente desempeño! La auditoría alcanzó un ${porcentaje.toFixed(2)} %, ` +
+        `cumpliendo o superando la meta corporativa del 94 %. Se evidencia un adecuado ` +
+        `cumplimiento de los estándares establecidos. Se recomienda mantener las buenas ` +
+        `prácticas y fortalecer la mejora continua.`
+    };
+  }
+
+  if (porcentaje >= 80) {
+    return {
+      estado: 'REGULAR',
+      clase: 'regular',
+      mensaje:
+        `Desempeño aceptable con oportunidades de mejora. Se obtuvo un cumplimiento de ` +
+        `${porcentaje.toFixed(2)} %, por debajo de la meta del 94 %. Se recomienda ejecutar ` +
+        `acciones correctivas sobre los hallazgos identificados para alcanzar el estándar ` +
+        `esperado en la siguiente evaluación.`
+    };
+  }
+
+  return {
+    estado: 'POR MEJORAR',
+    clase: 'improve',
+    mensaje:
+      `Resultado por mejorar. La auditoría alcanzó un cumplimiento de ` +
+      `${porcentaje.toFixed(2)} %, inferior a la meta del 94 %. Se recomienda implementar ` +
+      `un plan de acción inmediato, reforzar el seguimiento de las desviaciones y verificar ` +
+      `la eficacia de las acciones correctivas antes de la próxima auditoría.`
+  };
+}
+
+function renderResultadoFinal() {
+  const table = document.getElementById('tablaResultadosGalpones');
+  const average = document.getElementById('resultadoPromedioFinal');
+  const message = document.getElementById('mensajeResultado');
+
+  if (!table || !average || !message) return;
+
+  const resultados = statsPorGalpones();
+  const promedio = promedioFinalGalpones();
+  const clasificacion = clasificarResultado(promedio);
+
+  if (!resultados.length) {
+    table.innerHTML = '<p class="note">Ingrese los galpones para calcular los resultados.</p>';
+    average.innerHTML = '';
+    message.innerHTML = '';
+    return;
+  }
+
+  table.innerHTML = `
+    <div class="result-table-wrap">
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>Galpón</th>
+            <th>Cumple</th>
+            <th>No cumple</th>
+            <th>No aplica</th>
+            <th>Pendientes</th>
+            <th>Evaluados</th>
+            <th>Resultado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${resultados.map(g => `
+            <tr>
+              <td><b>Galpón ${esc(g.numero)}</b></td>
+              <td>${g.cumple}</td>
+              <td>${g.noCumple}</td>
+              <td>${g.noAplica}</td>
+              <td>${g.pendiente}</td>
+              <td>${g.evaluados}</td>
+              <td><b>${g.porcentaje.toFixed(2)} %</b></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  average.className = `average-result ${clasificacion.clase}`;
+  average.innerHTML = `
+    <div class="average-number">${promedio.toFixed(2)} %</div>
+    <div class="average-state">${clasificacion.estado}</div>
+    <div class="average-meta">Meta corporativa: ${META_CUMPLIMIENTO} %</div>
+  `;
+
+  message.className = `audit-message ${clasificacion.clase}`;
+  message.innerHTML = `
+    <h4>Mensaje del auditor</h4>
+    <p>${clasificacion.mensaje}</p>
+  `;
+}
+
+/* Reemplaza el porcentaje general anterior por el promedio de los galpones */
+const originalStatsV10 = stats;
+stats = function() {
+  const base = originalStatsV10();
+  base.pct = promedioFinalGalpones();
+  base.porGalpon = statsPorGalpones();
+  base.clasificacion = clasificarResultado(base.pct);
+  return base;
+};
+
+/* Extiende la representación del resumen */
+const originalRenderSummaryV10 = renderSummary;
+renderSummary = function() {
+  originalRenderSummaryV10();
+  renderResultadoFinal();
+
+  const promedio = promedioFinalGalpones();
+  const clasificacion = clasificarResultado(promedio);
+
+  const pct = document.getElementById('pct');
+  if (pct) pct.textContent = promedio.toFixed(2) + '%';
+
+  const resumenDatos = document.getElementById('resumenDatos');
+  if (resumenDatos && !resumenDatos.querySelector('.summary-classification')) {
+    resumenDatos.insertAdjacentHTML(
+      'beforeend',
+      `<p class="summary-classification">
+        <b>Resultado final:</b> ${promedio.toFixed(2)} % ·
+        <b>Clasificación:</b> ${clasificacion.estado} ·
+        <b>Meta:</b> ${META_CUMPLIMIENTO} %
+      </p>`
+    );
+  }
+};
+
+/* Actualiza resultados en cada guardado o respuesta */
+const originalSaveV10 = save;
+save = function() {
+  originalSaveV10();
+  renderResultadoFinal();
+};
+
+/* Incluye clasificación y promedio en el historial */
+const originalBuildHistoryRecordV10 = buildHistoryRecord;
+buildHistoryRecord = function(existingState = state) {
+  const record = originalBuildHistoryRecordV10(existingState);
+  const promedio = promedioFinalGalpones();
+  const clasificacion = clasificarResultado(promedio);
+
+  record.porcentaje = promedio;
+  record.clasificacion = clasificacion.estado;
+  record.resultadosGalpones = statsPorGalpones();
+
+  return record;
+};
+
+/* Muestra clasificación en las tarjetas del historial */
+const originalRenderHistoryV10 = renderHistory;
+renderHistory = function() {
+  originalRenderHistoryV10();
+
+  document.querySelectorAll('.history-card').forEach(card => {
+    const title = card.querySelector('h3')?.textContent || '';
+    const items = getHistory();
+    const record = items.find(r => title.includes(r.granja || '') && title.includes(r.fecha || ''));
+
+    if (record && record.clasificacion && !card.querySelector('.history-classification')) {
+      const main = card.querySelector('.history-main > div');
+      main?.insertAdjacentHTML(
+        'beforeend',
+        `<p class="history-classification">
+          <b>Clasificación:</b> ${esc(record.clasificacion)} ·
+          <b>Meta:</b> ${META_CUMPLIMIENTO} %
+        </p>`
+      );
+    }
+  });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(renderResultadoFinal, 0);
+});
