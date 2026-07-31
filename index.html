@@ -21,7 +21,7 @@
   <div class="login-card">
     <img src="logo-santa-elena.png" alt="Santa Elena" class="login-logo">
     <h2>AUDITORÍA EN GRANJAS - CALIDAD</h2>
-    <p>Check List de Crianza de Pollos Convencional</p>
+    <p>AUDITORÍA EN GRANJAS - CALIDAD</p>
     <label>Usuario
       <input id="loginUsuario" autocomplete="username" placeholder="Ingrese su usuario">
     </label>
@@ -35,7 +35,7 @@
 
 <div id="appContainer" class="app-hidden">
 
-<header class="app-header"><div class="brand"><img src="logo-santa-elena.png" alt="Santa Elena" class="brand-logo"><div><h1>Check List de Crianza de Pollos Convencional</h1><p>Auditoría por galpones · funciona sin conexión</p></div></div>
+<header class="app-header"><div class="brand"><img src="logo-santa-elena.png" alt="Santa Elena" class="brand-logo"><div><h1>Check List de Crianza de Pollos Convencional</h1><p>Sistema de gestión, resultados e informes de calidad</p></div></div>
 <div class="header-actions">
   <span id="usuarioActivo" class="user-badge"></span>
   <span id="net" class="badge">Verificando…</span>
@@ -43,7 +43,7 @@
 </div></header>
 
 <nav>
-  <button data-tab="historial" class="active">Resultados</button><button data-tab="graficos">Gráficos</button>
+  <button data-tab="historial" class="active">Resultados</button><button data-tab="graficos">Dashboard</button>
   <button id="navNuevaAuditoria" type="button">Nueva auditoría</button>
   <button data-tab="datos" class="audit-nav hidden-audit-nav">1. Datos</button>
   <button data-tab="checklist" class="audit-nav hidden-audit-nav">2. Checklist</button>
@@ -70,7 +70,7 @@
 </tbody></table></div>
 <div class="actions"><button id="guardarDatos" class="primary">Guardar y continuar</button><button id="nuevo" class="danger">Nueva auditoría</button></div></div></section>
 <section id="checklist" class="tab"><div class="toolbar"><input id="buscar" placeholder="Buscar ítem, detalle o criterio"><select id="filtro"><option value="">Todos</option><option>CUMPLE</option><option>NO CUMPLE</option><option>NO APLICA</option><option value="PENDIENTE">Pendientes</option></select><span id="avance"></span></div><div id="lista"></div></section>
-<section id="resumen" class="tab"><div class="card"><div class="report-title"><div><h2>Informe de auditoría</h2><p>Check List de Crianza de Pollos Convencional</p></div><img src="logo-santa-elena.png" alt="Santa Elena" class="report-logo"></div><div id="resumenDatos"></div><div class="kpis"><div><b id="pct">0%</b><span>Cumplimiento</span></div><div><b id="cumple">0</b><span>Cumple</span></div><div><b id="nocumple">0</b><span>No cumple</span></div><div><b id="pendientes">0</b><span>Pendientes</span></div></div>
+<section id="resumen" class="tab"><div class="card"><div class="report-title"><div><h2>Informe de auditoría</h2><p>AUDITORÍA EN GRANJAS - CALIDAD</p></div><img src="logo-santa-elena.png" alt="Santa Elena" class="report-logo"></div><div id="resumenDatos"></div><div class="kpis"><div><b id="pct">0%</b><span>Cumplimiento</span></div><div><b id="cumple">0</b><span>Cumple</span></div><div><b id="nocumple">0</b><span>No cumple</span></div><div><b id="pendientes">0</b><span>Pendientes</span></div></div>
 <div id="resultadoFinalDetalle" class="final-result-card">
   <h3>Resultado final por galpón</h3>
   <div id="tablaResultadosGalpones"></div>
@@ -84,8 +84,8 @@
   <div class="card">
     <div class="history-head">
       <div>
-        <h2>Resultados del Check List</h2>
-        <p class="note">Consulte auditorías anteriores, resultados, estado y PDF. El checklist solo se abre al crear una nueva auditoría o editar una propia.</p>
+        <h2>Historial de Auditorías</h2>
+        <p class="note">Consulte auditorías anteriores, resultados, estados e informes PDF.</p>
       </div>
       <div class="history-top-actions">
         <button id="crearDesdeResultados" class="primary" type="button">Nueva auditoría</button>

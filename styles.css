@@ -199,3 +199,25 @@ button:disabled,input:disabled,select:disabled,textarea:disabled{opacity:.65;cur
   .chart-kpis{grid-template-columns:1fr 1fr}
   .charts-header{flex-direction:column}
 }
+
+
+/* V15: navegación ejecutiva */
+nav button[data-tab="historial"],
+nav button[data-tab="graficos"],
+#navNuevaAuditoria{
+  min-width:125px;
+}
+nav button[data-tab="graficos"].active{
+  background:#137a57;
+  color:white;
+  border-color:#137a57;
+}
+@media(max-width:650px){
+  nav{
+    overflow-x:auto;
+    flex-wrap:nowrap;
+  }
+  nav button{
+    white-space:nowrap;
+  }
+}

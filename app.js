@@ -1127,3 +1127,72 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(graphTab?.classList.contains('active')) renderCharts();
   });
 });
+
+
+
+/* ===== V15: Resultados | Dashboard | Nueva auditoría con login obligatorio ===== */
+const PENDING_NEW_AUDIT_V15 = 'accion-pendiente-nueva-auditoria-v15';
+
+function hasValidSessionV15() {
+  try {
+    const saved = sessionStorage.getItem(SESSION_KEY);
+    if (!saved) return false;
+    const session = JSON.parse(saved);
+    return !!(session && session.usuario && USUARIOS[session.usuario]);
+  } catch {
+    return false;
+  }
+}
+
+function requestNewAuditV15() {
+  if (hasValidSessionV15()) {
+    crearAuditoriaLimpiaV11();
+    return;
+  }
+
+  sessionStorage.setItem(PENDING_NEW_AUDIT_V15, '1');
+  showLoginScreen();
+
+  const error = document.getElementById('loginError');
+  if (error) error.textContent = 'Ingrese con su usuario para crear una nueva auditoría.';
+}
+
+function bindNewAuditButtonsV15() {
+  ['navNuevaAuditoria', 'crearDesdeResultados'].forEach(id => {
+    const oldButton = document.getElementById(id);
+    if (!oldButton) return;
+
+    const newButton = oldButton.cloneNode(true);
+    oldButton.parentNode.replaceChild(newButton, oldButton);
+
+    newButton.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      requestNewAuditV15();
+    }, true);
+  });
+}
+
+/* Después del login, abre automáticamente una auditoría nueva. */
+const mostrarAplicacionAntesV15 = mostrarAplicacion;
+mostrarAplicacion = function(sesion) {
+  mostrarAplicacionAntesV15(sesion);
+
+  if (sessionStorage.getItem(PENDING_NEW_AUDIT_V15) === '1') {
+    sessionStorage.removeItem(PENDING_NEW_AUDIT_V15);
+    setTimeout(() => crearAuditoriaLimpiaV11(), 80);
+  }
+};
+
+/* Volver desde el login cancela la solicitud de nueva auditoría. */
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(bindNewAuditButtonsV15, 150);
+
+  document.getElementById('volverPortadaLogin')?.addEventListener('click', () => {
+    sessionStorage.removeItem(PENDING_NEW_AUDIT_V15);
+  });
+
+  document.querySelectorAll('nav button[data-tab="graficos"]').forEach(button => {
+    button.addEventListener('click', () => setTimeout(renderCharts, 30));
+  });
+});
