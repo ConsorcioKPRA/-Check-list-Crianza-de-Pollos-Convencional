@@ -1,6 +1,23 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0f4c3a"><title>Auditoría Crianza Convencional</title><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css"></head><body>
-<div id="loginScreen" class="login-screen">
+
+<div id="landingScreen" class="landing-screen">
+  <div class="landing-card">
+    <img src="logo-santa-elena.png" alt="Santa Elena" class="landing-logo">
+    <h1>Sistema de Auditorías</h1>
+    <p>Check List de Crianza de Pollos Convencional</p>
+    <div class="landing-actions">
+      <button id="abrirLogin" class="primary landing-btn" type="button">
+        Ingresar al sistema
+      </button>
+      <button id="abrirHistorialPublico" class="landing-btn secondary" type="button">
+        Ver historial de auditorías
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="loginScreen" class="login-screen login-hidden">
   <div class="login-card">
     <img src="logo-santa-elena.png" alt="Santa Elena" class="login-logo">
     <h2>Ingreso al sistema</h2>
@@ -11,7 +28,7 @@
     <label>Contraseña
       <input id="loginClave" type="password" autocomplete="current-password" placeholder="Ingrese su contraseña">
     </label>
-    <button id="btnIngresar" class="primary login-button">Ingresar</button>
+    <button id="btnIngresar" class="primary login-button">Ingresar</button><button id="volverPortadaLogin" class="login-cancel" type="button">Volver</button>
     <p id="loginError" class="login-error" aria-live="polite"></p>
   </div>
 </div>
@@ -22,11 +39,19 @@
 <div class="header-actions">
   <span id="usuarioActivo" class="user-badge"></span>
   <span id="net" class="badge">Verificando…</span>
-  <button id="cerrarSesion" class="logout-btn" type="button">Cerrar sesión</button>
+  <button id="volverPortada" class="logout-btn" type="button">Inicio</button><button id="cerrarSesion" class="logout-btn" type="button">Cerrar sesión</button>
 </div></header>
-<nav><button data-tab="datos" class="active">1. Datos</button><button data-tab="checklist">2. Checklist</button><button data-tab="resumen">3. Resumen/PDF</button><button data-tab="historial">4. Historial</button></nav>
+
+<nav>
+  <button data-tab="historial" class="active">Resultados del Check List</button>
+  <button id="navNuevaAuditoria" type="button">Nueva auditoría</button>
+  <button data-tab="datos" class="audit-nav hidden-audit-nav">1. Datos</button>
+  <button data-tab="checklist" class="audit-nav hidden-audit-nav">2. Checklist</button>
+  <button data-tab="resumen" class="audit-nav hidden-audit-nav">3. Resumen/PDF</button>
+</nav>
+
 <main>
-<section id="datos" class="tab active">
+<section id="datos" class="tab">
 <div class="card"><h2>Datos generales</h2><div class="grid general-grid">
 <label>Fecha de auditoría<input id="fecha" type="date"></label>
 <label>Granja<input id="granja" placeholder="Nombre de la granja"></label>
@@ -47,14 +72,23 @@
 <section id="checklist" class="tab"><div class="toolbar"><input id="buscar" placeholder="Buscar ítem, detalle o criterio"><select id="filtro"><option value="">Todos</option><option>CUMPLE</option><option>NO CUMPLE</option><option>NO APLICA</option><option value="PENDIENTE">Pendientes</option></select><span id="avance"></span></div><div id="lista"></div></section>
 <section id="resumen" class="tab"><div class="card"><div class="report-title"><div><h2>Informe de auditoría</h2><p>Check List de Crianza de Pollos Convencional</p></div><img src="logo-santa-elena.png" alt="Santa Elena" class="report-logo"></div><div id="resumenDatos"></div><div class="kpis"><div><b id="pct">0%</b><span>Cumplimiento</span></div><div><b id="cumple">0</b><span>Cumple</span></div><div><b id="nocumple">0</b><span>No cumple</span></div><div><b id="pendientes">0</b><span>Pendientes</span></div></div><div id="desviaciones"></div><div class="actions"><button id="guardarHistorial" class="primary">Guardar auditoría en historial</button><button id="imprimir" class="primary">Descargar / imprimir PDF</button><button id="exportar">Exportar respaldo</button><label class="filebtn">Importar respaldo<input id="importar" type="file" accept="application/json"></label><button id="correo">Preparar correo</button><button id="marcarEnviada">Marcar como enviada</button></div><p class="note">Los datos y fotos se guardan localmente. Use “Exportar respaldo” para evitar pérdidas.</p></div></section>
 
-<section id="historial" class="tab">
+<section id="historial" class="tab active">
   <div class="card">
     <div class="history-head">
       <div>
-        <h2>Historial de auditorías</h2>
-        <p class="note">Todos los usuarios pueden visualizar y descargar los informes. Solo el auditor responsable o el administrador pueden editar una auditoría guardada.</p>
+        <h2>Resultados del Check List</h2>
+        <p class="note">Consulte auditorías anteriores, resultados, estado y PDF. El checklist solo se abre al crear una nueva auditoría o editar una propia.</p>
       </div>
-      <button id="actualizarHistorial" type="button">Actualizar historial</button>
+      <div class="history-top-actions">
+        <button id="crearDesdeResultados" class="primary" type="button">Nueva auditoría</button>
+        <button id="actualizarHistorial" type="button">Actualizar resultados</button>
+      </div>
+    </div>
+    <div class="result-kpis">
+      <div><b id="histTotal">0</b><span>Auditorías</span></div>
+      <div><b id="histPromedio">0%</b><span>Promedio</span></div>
+      <div><b id="histGuardadas">0</b><span>Guardadas</span></div>
+      <div><b id="histEnviadas">0</b><span>Enviadas</span></div>
     </div>
     <div class="toolbar history-toolbar">
       <input id="buscarHistorial" placeholder="Buscar por granja, auditor, campaña, visita o fecha">

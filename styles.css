@@ -38,3 +38,38 @@
 .empty-history{padding:24px;text-align:center;background:#f5f8f6;border-radius:12px;color:#667}
 button:disabled,input:disabled,select:disabled,textarea:disabled{opacity:.65;cursor:not-allowed}
 @media(max-width:700px){.history-head,.history-main{flex-direction:column}.history-toolbar{grid-template-columns:1fr}}
+
+
+/* V8: inicio en resultados */
+.hidden-audit-nav{display:none!important}
+.history-top-actions{display:flex;gap:10px;flex-wrap:wrap}
+.result-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.result-kpis div{background:#f0f6f3;border:1px solid #d7e5de;border-radius:12px;padding:18px;text-align:center}
+.result-kpis b{display:block;font-size:26px;color:#0f4c3a}
+.result-kpis span{display:block;font-size:12px;margin-top:4px;color:#556}
+@media(max-width:700px){
+  .result-kpis{grid-template-columns:1fr 1fr}
+  .history-top-actions{width:100%}
+  .history-top-actions button{flex:1}
+}
+
+
+/* V9: portada inicial */
+.screen-hidden{display:none!important}
+.login-hidden{display:none!important}
+.landing-screen{
+  position:fixed;inset:0;z-index:10000;
+  display:flex;align-items:center;justify-content:center;
+  padding:22px;background:linear-gradient(135deg,#0f4c3a,#1d7157)
+}
+.landing-card{
+  width:min(470px,100%);background:white;border-radius:20px;
+  padding:32px;box-shadow:0 24px 70px #0005;text-align:center
+}
+.landing-logo{width:145px;height:120px;object-fit:contain}
+.landing-card h1{color:#17211d;font-size:28px;margin:8px 0}
+.landing-card p{color:#56645e;margin:0 0 26px}
+.landing-actions{display:grid;gap:14px}
+.landing-btn{width:100%;padding:15px 18px;font-size:16px}
+.landing-btn.secondary{background:white;color:#0f4c3a;border:2px solid #137a57}
+.login-cancel{width:100%;margin-top:10px}

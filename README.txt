@@ -1,13 +1,11 @@
-CHECK LIST CRIANZA CONVENCIONAL - V7
+CHECK LIST CRIANZA CONVENCIONAL - V9
 
-REGLAS DE ACCESO
-- Todos los usuarios pueden ver el historial.
-- Todos los usuarios pueden descargar los PDF históricos.
-- Solo el auditor responsable puede modificar su auditoría guardada o enviada.
-- El administrador puede editar cualquier auditoría.
-- Al abrir una auditoría de otro auditor se muestra en modo solo lectura.
+PANTALLA DE INICIO
+Al abrir el enlace aparecen dos opciones:
+1. Ingresar al sistema
+2. Ver historial de auditorías
 
-IMPORTANTE
-Este historial se guarda en el navegador del dispositivo mediante localStorage.
-Para que todos vean el mismo historial desde diferentes celulares o computadoras,
-se deberá conectar posteriormente una base de datos en la nube, por ejemplo Supabase.
+REGLAS
+- Login: permite crear y editar auditorías según permisos.
+- Historial: permite consultar y descargar auditorías.
+- Solo el auditor responsable o el administrador pueden editar una auditoría guardada.

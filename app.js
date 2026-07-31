@@ -456,3 +456,137 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderHistory();
 });
+
+
+/* ===== V8: pantalla inicial de resultados ===== */
+function showAuditNavigation(show) {
+  document.querySelectorAll('.audit-nav').forEach(el => {
+    el.classList.toggle('hidden-audit-nav', !show);
+  });
+}
+
+function openResultsHome() {
+  showAuditNavigation(false);
+  if (typeof tab === 'function') tab('historial');
+  if (typeof renderHistory === 'function') renderHistory();
+}
+
+function startNewAuditFromHome() {
+  resetCurrentAuditId();
+  localStorage.removeItem(KEY);
+  state = {
+    datos: {fecha:'',granja:'',supervisor:'',campana:'',visita:'',auditor:currentAuditorName()},
+    galpones: [EMPTY_GALPON(), EMPTY_GALPON(), EMPTY_GALPON()],
+    respuestas: {}
+  };
+  localStorage.setItem(KEY, JSON.stringify(state));
+  showAuditNavigation(true);
+  if (typeof loadDatos === 'function') loadDatos();
+  if (typeof renderList === 'function') renderList();
+  if (typeof renderSummary === 'function') renderSummary();
+  setEditingEnabled(true);
+  if (typeof tab === 'function') tab('datos');
+}
+
+const originalLoadAuditFromHistory = loadAuditFromHistory;
+loadAuditFromHistory = function(id, editMode) {
+  showAuditNavigation(true);
+  return originalLoadAuditFromHistory(id, editMode);
+};
+
+const originalRenderHistoryV8 = renderHistory;
+renderHistory = function() {
+  originalRenderHistoryV8();
+
+  const items = getHistory();
+  const total = items.length;
+  const promedio = total
+    ? items.reduce((acc, x) => acc + Number(x.porcentaje || 0), 0) / total
+    : 0;
+  const guardadas = items.filter(x => x.estado === 'GUARDADA').length;
+  const enviadas = items.filter(x => x.estado === 'ENVIADA').length;
+
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+  setText('histTotal', total);
+  setText('histPromedio', promedio.toFixed(1) + '%');
+  setText('histGuardadas', guardadas);
+  setText('histEnviadas', enviadas);
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('navNuevaAuditoria')?.addEventListener('click', startNewAuditFromHome);
+  document.getElementById('crearDesdeResultados')?.addEventListener('click', startNewAuditFromHome);
+
+  document.querySelectorAll('nav button[data-tab="historial"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      showAuditNavigation(false);
+      renderHistory();
+    });
+  });
+
+  setTimeout(() => {
+    openResultsHome();
+  }, 0);
+});
+
+
+/* ===== V9: portada con Login o Historial ===== */
+function hideAllMainScreens() {
+  document.getElementById('landingScreen')?.classList.add('screen-hidden');
+  document.getElementById('loginScreen')?.classList.add('login-hidden');
+  document.getElementById('appContainer')?.classList.add('app-hidden');
+}
+
+function showLanding() {
+  hideAllMainScreens();
+  document.getElementById('landingScreen')?.classList.remove('screen-hidden');
+}
+
+function showLoginScreen() {
+  hideAllMainScreens();
+  document.getElementById('loginScreen')?.classList.remove('login-hidden');
+  document.getElementById('loginUsuario')?.focus();
+}
+
+function showPublicHistory() {
+  hideAllMainScreens();
+  document.getElementById('appContainer')?.classList.remove('app-hidden');
+  showAuditNavigation(false);
+  if (typeof tab === 'function') tab('historial');
+  if (typeof renderHistory === 'function') renderHistory();
+
+  const userBadge = document.getElementById('usuarioActivo');
+  if (userBadge) userBadge.textContent = 'Consulta de historial';
+
+  const logout = document.getElementById('cerrarSesion');
+  if (logout) logout.style.display = 'none';
+}
+
+const originalMostrarAplicacionV9 = mostrarAplicacion;
+mostrarAplicacion = function(sesion) {
+  hideAllMainScreens();
+  document.getElementById('appContainer')?.classList.remove('app-hidden');
+  const logout = document.getElementById('cerrarSesion');
+  if (logout) logout.style.display = '';
+  originalMostrarAplicacionV9(sesion);
+  showAuditNavigation(false);
+  if (typeof tab === 'function') tab('historial');
+  if (typeof renderHistory === 'function') renderHistory();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('abrirLogin')?.addEventListener('click', showLoginScreen);
+  document.getElementById('abrirHistorialPublico')?.addEventListener('click', showPublicHistory);
+  document.getElementById('volverPortadaLogin')?.addEventListener('click', showLanding);
+  document.getElementById('volverPortada')?.addEventListener('click', showLanding);
+
+  const storedSession = sessionStorage.getItem(SESSION_KEY);
+  if (storedSession) {
+    sessionStorage.removeItem(SESSION_KEY);
+  }
+
+  setTimeout(showLanding, 0);
+});
