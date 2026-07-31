@@ -221,3 +221,13 @@ nav button[data-tab="graficos"].active{
     white-space:nowrap;
   }
 }
+
+
+/* V16: campos y gráfico por granja */
+.history-zone-chief{
+  color:#40564c;
+  margin-top:5px;
+}
+#chartGranjas{
+  height:380px;
+}

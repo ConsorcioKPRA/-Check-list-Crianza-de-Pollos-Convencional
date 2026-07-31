@@ -1196,3 +1196,141 @@ document.addEventListener('DOMContentLoaded', () => {
     button.addEventListener('click', () => setTimeout(renderCharts, 30));
   });
 });
+
+
+
+/* ===== V16: login directo, zona, jefe y gráfico por granja ===== */
+
+/* Nuevos campos de datos generales */
+if (!generalFields.includes('zona')) generalFields.splice(2, 0, 'zona');
+if (!generalFields.includes('jefe')) generalFields.splice(3, 0, 'jefe');
+
+if (!('zona' in state.datos)) state.datos.zona = '';
+if (!('jefe' in state.datos)) state.datos.jefe = '';
+
+/* Validación de Zona y Jefe */
+const validateDatosAntesV16 = validateDatos;
+validateDatos = function() {
+  const missing = [];
+  if (!state.datos.fecha) missing.push('Fecha de auditoría');
+  if (!String(state.datos.granja || '').trim()) missing.push('Granja');
+  if (!String(state.datos.zona || '').trim()) missing.push('Zona');
+  if (!String(state.datos.jefe || '').trim()) missing.push('Jefe');
+  if (!String(state.datos.supervisor || '').trim()) missing.push('Supervisor');
+  if (!String(state.datos.campana || '').trim()) missing.push('Campaña');
+  if (!String(state.datos.auditor || '').trim()) missing.push('Auditor(a)');
+  if (activeGalpones().length === 0) missing.push('al menos un número de galpón');
+
+  if (missing.length) {
+    alert('Complete: ' + missing.join(', '));
+    return false;
+  }
+  return true;
+};
+
+/* Nueva auditoría siempre abre el login directamente */
+function abrirLoginNuevaAuditoriaV16() {
+  sessionStorage.setItem(PENDING_NEW_AUDIT_V15, '1');
+  hideAllMainScreens();
+  document.getElementById('loginScreen')?.classList.remove('login-hidden');
+  document.getElementById('loginUsuario')?.focus();
+
+  const error = document.getElementById('loginError');
+  if (error) error.textContent = '';
+}
+
+function bindNuevaAuditoriaDirectaV16() {
+  ['navNuevaAuditoria', 'crearDesdeResultados'].forEach(id => {
+    const oldButton = document.getElementById(id);
+    if (!oldButton) return;
+
+    const newButton = oldButton.cloneNode(true);
+    oldButton.parentNode.replaceChild(newButton, oldButton);
+
+    newButton.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      abrirLoginNuevaAuditoriaV16();
+    }, true);
+  });
+}
+
+/* Resumen con Zona y Jefe */
+const renderSummaryAntesV16 = renderSummary;
+renderSummary = function() {
+  renderSummaryAntesV16();
+
+  const resumen = document.getElementById('resumenDatos');
+  if (!resumen) return;
+
+  const p = resumen.querySelector('p');
+  if (p) {
+    p.innerHTML = `
+      <b>Fecha:</b> ${esc(state.datos.fecha)} &nbsp;
+      <b>Granja:</b> ${esc(state.datos.granja)} &nbsp;
+      <b>Zona:</b> ${esc(state.datos.zona)} &nbsp;
+      <b>Jefe:</b> ${esc(state.datos.jefe)} &nbsp;
+      <b>Supervisor:</b> ${esc(state.datos.supervisor)} &nbsp;
+      <b>Campaña:</b> ${esc(state.datos.campana)} &nbsp;
+      <b>Visita:</b> ${esc(state.datos.visita || '')} &nbsp;
+      <b>Auditor(a):</b> ${esc(state.datos.auditor)}
+    `;
+  }
+};
+
+/* Guardar Zona y Jefe en historial */
+const buildHistoryRecordAntesV16 = buildHistoryRecord;
+buildHistoryRecord = function(existingState = state) {
+  const record = buildHistoryRecordAntesV16(existingState);
+  record.zona = existingState.datos?.zona || '';
+  record.jefe = existingState.datos?.jefe || '';
+  record.datos = JSON.parse(JSON.stringify(existingState.datos || {}));
+  return record;
+};
+
+/* Mostrar Zona y Jefe en tarjetas del historial */
+const renderHistoryAntesV16 = renderHistory;
+renderHistory = function() {
+  renderHistoryAntesV16();
+
+  document.querySelectorAll('.history-card').forEach(card => {
+    const heading = card.querySelector('h3')?.textContent || '';
+    const record = getHistory().find(r =>
+      heading.includes(r.granja || '') && heading.includes(r.fecha || '')
+    );
+    if (!record || card.querySelector('.history-zone-chief')) return;
+
+    const main = card.querySelector('.history-main > div');
+    if (main) {
+      main.insertAdjacentHTML(
+        'beforeend',
+        `<p class="history-zone-chief">
+          <b>Zona:</b> ${esc(record.zona || record.datos?.zona || 'Sin dato')} ·
+          <b>Jefe:</b> ${esc(record.jefe || record.datos?.jefe || 'Sin dato')}
+        </p>`
+      );
+    }
+  });
+};
+
+/* Comparación de varias granjas */
+function drawFarmComparisonV16() {
+  const data = chartHistoryData();
+  const rows = groupedAverage(
+    data,
+    item => item.granja || item.datos?.granja || 'Sin granja',
+    item => item.porcentaje
+  ).slice(0, 20);
+
+  drawBarChart('chartGranjas', rows);
+}
+
+const renderChartsAntesV16 = renderCharts;
+renderCharts = function() {
+  renderChartsAntesV16();
+  drawFarmComparisonV16();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(bindNuevaAuditoriaDirectaV16, 250);
+});

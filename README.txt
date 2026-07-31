@@ -1,22 +1,13 @@
-AUDITORÍA EN GRANJAS - CALIDAD V15
+AUDITORÍA EN GRANJAS - CALIDAD V16
 
-NAVEGACIÓN PÚBLICA:
-- Resultados
-- Dashboard
-- Nueva auditoría
-
-REGLA PRINCIPAL:
-- Resultados y Dashboard pueden consultarse desde el historial.
-- Al pulsar Nueva auditoría, siempre se solicita login si no existe una sesión válida.
-- Después de iniciar sesión correctamente, se crea automáticamente una auditoría nueva.
-- El auditor queda asignado como responsable de la auditoría.
-
-DASHBOARD:
-- Total de auditorías
-- Promedio general
-- Auditorías que alcanzan la meta
-- Auditorías debajo de meta
-- Clasificación Bueno / Regular / Por mejorar
-- Promedio por auditor
-- Tendencia histórica
-- Promedio por galpón
+CAMBIOS:
+- Nueva auditoría abre directamente la pantalla de login.
+- No abre Datos, Checklist ni otras pantallas antes del login.
+- Después del login se crea una nueva auditoría.
+- Se agregó Zona: Norte, Centro y Sur.
+- Se agregó Jefe:
+  Cristhian Mata
+  Bernardo Silva
+  Pierre Fournier
+- Se agregó gráfico comparativo de resultados entre varias granjas.
+- Zona y Jefe se guardan en el historial y aparecen en el resumen/PDF.
