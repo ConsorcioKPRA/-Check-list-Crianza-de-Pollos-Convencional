@@ -1,10 +1,13 @@
-CHECK LIST V11 CORREGIDO
+CHECK LIST V14 - GRÁFICOS
 
-- La auditoría nueva pertenece al usuario que inicia sesión.
-- El auditor responsable puede guardar y marcar como enviada su auditoría.
-- Otros auditores solo pueden verla.
-- El administrador puede editar todas.
-- Porcentaje por galpón = Cumple / (Cumple + No cumple) x 100.
-- No aplica no se califica.
-- Resultado final = promedio de porcentajes por galpón.
-- >=94 % BUENO; >=80 % REGULAR; <80 % POR MEJORAR.
+Se agregó una pestaña “Gráficos” al lado de “Resultados”.
+
+GRÁFICOS:
+- Clasificación: Bueno, Regular y Por mejorar.
+- Promedio por auditor.
+- Tendencia histórica de las últimas auditorías.
+- Resultado promedio por número de galpón.
+- Línea de meta corporativa de 94 %.
+- Indicadores: auditorías, promedio, resultados buenos y debajo de meta.
+
+Los gráficos utilizan la información del historial guardado en el navegador.

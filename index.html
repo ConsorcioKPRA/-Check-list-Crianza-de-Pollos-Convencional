@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0f4c3a"><title>Auditoría Crianza Convencional</title><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css"></head><body>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0f4c3a"><title>Auditoría en Granjas - Calidad</title><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css"></head><body>
 
 <div id="landingScreen" class="landing-screen">
   <div class="landing-card">
     <img src="logo-santa-elena.png" alt="Santa Elena" class="landing-logo">
     <h1>Sistema de Auditorías</h1>
-    <p>Check List de Crianza de Pollos Convencional</p>
+    <p>Ingreso al sistema de auditorías</p>
     <div class="landing-actions">
       <button id="abrirLogin" class="primary landing-btn" type="button">
         Ingresar al sistema
@@ -20,7 +20,7 @@
 <div id="loginScreen" class="login-screen login-hidden">
   <div class="login-card">
     <img src="logo-santa-elena.png" alt="Santa Elena" class="login-logo">
-    <h2>Ingreso al sistema</h2>
+    <h2>AUDITORÍA EN GRANJAS - CALIDAD</h2>
     <p>Check List de Crianza de Pollos Convencional</p>
     <label>Usuario
       <input id="loginUsuario" autocomplete="username" placeholder="Ingrese su usuario">
@@ -43,7 +43,7 @@
 </div></header>
 
 <nav>
-  <button data-tab="historial" class="active">Resultados del Check List</button>
+  <button data-tab="historial" class="active">Resultados</button><button data-tab="graficos">Gráficos</button>
   <button id="navNuevaAuditoria" type="button">Nueva auditoría</button>
   <button data-tab="datos" class="audit-nav hidden-audit-nav">1. Datos</button>
   <button data-tab="checklist" class="audit-nav hidden-audit-nav">2. Checklist</button>
@@ -107,6 +107,58 @@
       </select>
     </div>
     <div id="listaHistorial"></div>
+  </div>
+</section>
+
+
+<section id="graficos" class="tab">
+  <div class="card">
+    <div class="charts-header">
+      <div>
+        <h2>Indicadores gráficos de auditorías</h2>
+        <p class="note">Visualización consolidada de los resultados guardados en el historial.</p>
+      </div>
+      <button id="actualizarGraficos" type="button">Actualizar gráficos</button>
+    </div>
+
+    <div class="chart-kpis">
+      <div><b id="chartTotal">0</b><span>Auditorías</span></div>
+      <div><b id="chartAverage">0%</b><span>Promedio general</span></div>
+      <div><b id="chartGood">0</b><span>Resultados buenos</span></div>
+      <div><b id="chartBelowGoal">0</b><span>Debajo de meta</span></div>
+    </div>
+
+    <div class="charts-grid">
+      <article class="chart-card">
+        <h3>Clasificación de auditorías</h3>
+        <p>Distribución entre Bueno, Regular y Por mejorar.</p>
+        <canvas id="chartClasificacion" width="520" height="320"></canvas>
+        <div id="legendClasificacion" class="chart-legend"></div>
+      </article>
+
+      <article class="chart-card">
+        <h3>Promedio por auditor</h3>
+        <p>Comparación del desempeño promedio registrado por auditor(a).</p>
+        <canvas id="chartAuditores" width="620" height="340"></canvas>
+      </article>
+
+      <article class="chart-card chart-wide">
+        <h3>Tendencia histórica</h3>
+        <p>Resultado de las últimas auditorías frente a la meta corporativa de 94 %.</p>
+        <canvas id="chartTendencia" width="1100" height="360"></canvas>
+      </article>
+
+      <article class="chart-card chart-wide">
+        <h3>Resultado promedio por galpón</h3>
+        <p>Promedio de cumplimiento agrupado por número de galpón.</p>
+        <canvas id="chartGalpones" width="1100" height="360"></canvas>
+      </article>
+    </div>
+
+    <p class="note chart-note">
+      Los gráficos utilizan las auditorías guardadas en este navegador. Cuando el sistema se conecte a la nube,
+      mostrarán la información consolidada de todos los equipos.
+    </p>
   </div>
 </section>
 

@@ -680,7 +680,7 @@ function renderResultadoFinal() {
 
   if (!table || !average || !message) return;
 
-  const resultados = statsPorGalpones();
+  const resultados = statsPorGalpon();
   const promedio = promedioFinalGalpones();
   const clasificacion = clasificarResultado(promedio);
 
@@ -741,7 +741,7 @@ const originalStatsV10 = stats;
 stats = function() {
   const base = originalStatsV10();
   base.pct = promedioFinalGalpones();
-  base.porGalpon = statsPorGalpones();
+  base.porGalpon = statsPorGalpon();
   base.clasificacion = clasificarResultado(base.pct);
   return base;
 };
@@ -787,7 +787,7 @@ buildHistoryRecord = function(existingState = state) {
 
   record.porcentaje = promedio;
   record.clasificacion = clasificacion.estado;
-  record.resultadosGalpones = statsPorGalpones();
+  record.resultadosGalpones = statsPorGalpon();
 
   return record;
 };
@@ -828,7 +828,302 @@ function ensureAuditOwnerV11(){const u=currentUsername();if(!getAuditOwnerV11()&
 canEditAudit=function(record){if(currentRole()==='ADMIN')return true;const responsible=String(record?.auditorUsuario||record?.propietarioUsuario||getAuditOwnerV11()||'').toLowerCase();return !!responsible&&responsible===currentUsername()};
 function crearAuditoriaLimpiaV11(){localStorage.removeItem(CURRENT_AUDIT_ID_KEY);setAuditOwnerV11(currentUsername());state={datos:{fecha:new Date().toISOString().slice(0,10),granja:'',supervisor:'',campana:'',visita:'',auditor:currentAuditorName()},galpones:[EMPTY_GALPON(),EMPTY_GALPON(),EMPTY_GALPON()],respuestas:{}};localStorage.setItem(KEY,JSON.stringify(state));showAuditNavigation(true);loadDatos();renderList();renderSummary();setEditingEnabled(true);tab('datos')}
 const oldLoadHistoryV11=loadAuditFromHistory;loadAuditFromHistory=function(id,editMode){const record=getHistory().find(x=>x.id===id);if(record)setAuditOwnerV11(record.auditorUsuario||record.propietarioUsuario||'');return oldLoadHistoryV11(id,editMode)};
-const oldBuildRecordV11=buildHistoryRecord;buildHistoryRecord=function(existingState=state){const record=oldBuildRecordV11(existingState);const owner=getAuditOwnerV11()||currentUsername();const promedio=promedioFinalGalpones();const clasificacion=clasificarResultado(promedio);record.auditorUsuario=owner;record.propietarioUsuario=owner;record.auditor=existingState.datos?.auditor||currentAuditorName();record.porcentaje=promedio;record.clasificacion=clasificacion.estado;record.resultadosGalpones=statsPorGalpones();return record};
+const oldBuildRecordV11=buildHistoryRecord;buildHistoryRecord=function(existingState=state){const record=oldBuildRecordV11(existingState);const owner=getAuditOwnerV11()||currentUsername();const promedio=promedioFinalGalpones();const clasificacion=clasificarResultado(promedio);record.auditorUsuario=owner;record.propietarioUsuario=owner;record.auditor=existingState.datos?.auditor||currentAuditorName();record.porcentaje=promedio;record.clasificacion=clasificacion.estado;record.resultadosGalpones=statsPorGalpon();return record};
 guardarAuditoriaHistorial=function(){if(!validateDatos())return;ensureAuditOwnerV11();const items=getHistory();const id=auditId();const idx=items.findIndex(x=>x.id===id);const existing=idx>=0?items[idx]:null;if(existing&&!canEditAudit(existing)){alert('Esta auditoría pertenece a otro auditor y solo puede visualizarse.');return}const record=buildHistoryRecord();const now=new Date().toISOString();if(existing){record.creadoEn=existing.creadoEn||now;record.estado=existing.estado||'GUARDADA';record.enviadaEn=existing.enviadaEn||null;record.actualizadoEn=now;items[idx]=record}else{record.creadoEn=now;record.actualizadoEn=now;record.estado='GUARDADA';items.unshift(record)}saveHistory(items);renderHistory();renderSummary();alert(`Auditoría guardada. Resultado: ${record.porcentaje.toFixed(2)} % - ${record.clasificacion}`)};
-marcarAuditoriaEnviada=function(){let items=getHistory();const id=auditId();let idx=items.findIndex(x=>x.id===id);if(idx<0){guardarAuditoriaHistorial();items=getHistory();idx=items.findIndex(x=>x.id===id)}if(idx<0)return;if(!canEditAudit(items[idx])){alert('Esta auditoría pertenece a otro auditor y no puede modificarse.');return}const promedio=promedioFinalGalpones();items[idx].estado='ENVIADA';items[idx].enviadaEn=new Date().toISOString();items[idx].actualizadoEn=new Date().toISOString();items[idx].porcentaje=promedio;items[idx].clasificacion=clasificarResultado(promedio).estado;items[idx].resultadosGalpones=statsPorGalpones();saveHistory(items);renderHistory();renderSummary();alert(`Informe enviado. Resultado: ${promedio.toFixed(2)} % - ${items[idx].clasificacion}`)};
+marcarAuditoriaEnviada=function(){let items=getHistory();const id=auditId();let idx=items.findIndex(x=>x.id===id);if(idx<0){guardarAuditoriaHistorial();items=getHistory();idx=items.findIndex(x=>x.id===id)}if(idx<0)return;if(!canEditAudit(items[idx])){alert('Esta auditoría pertenece a otro auditor y no puede modificarse.');return}const promedio=promedioFinalGalpones();items[idx].estado='ENVIADA';items[idx].enviadaEn=new Date().toISOString();items[idx].actualizadoEn=new Date().toISOString();items[idx].porcentaje=promedio;items[idx].clasificacion=clasificarResultado(promedio).estado;items[idx].resultadosGalpones=statsPorGalpon();saveHistory(items);renderHistory();renderSummary();alert(`Informe enviado. Resultado: ${promedio.toFixed(2)} % - ${items[idx].clasificacion}`)};
 document.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>{const replaceHandler=(id,handler)=>{const el=document.getElementById(id);if(!el)return;const clone=el.cloneNode(true);el.parentNode.replaceChild(clone,el);clone.addEventListener('click',handler)};replaceHandler('navNuevaAuditoria',crearAuditoriaLimpiaV11);replaceHandler('crearDesdeResultados',crearAuditoriaLimpiaV11);replaceHandler('guardarHistorial',guardarAuditoriaHistorial);replaceHandler('marcarEnviada',marcarAuditoriaEnviada);renderResultadoFinal();renderSummary()},50)});
+
+
+/* ===== V12: selección de respuestas y colores corregidos ===== */
+answer = function(item, gi, val) {
+  const id = localStorage.getItem(CURRENT_AUDIT_ID_KEY);
+  const record = id ? getHistory().find(x => x.id === id) : null;
+
+  if (record && !canEditAudit(record)) {
+    alert('Esta auditoría pertenece a otro auditor y solo puede visualizarse.');
+    return;
+  }
+
+  ensureAuditOwnerV11();
+  const resp = getResp(item, gi);
+  resp.resultado = val;
+  resp.actualizadoEn = new Date().toISOString();
+
+  localStorage.setItem(KEY, JSON.stringify(state));
+  renderList();
+  renderProgress();
+  renderSummary();
+  renderResultadoFinal();
+};
+
+setEditingEnabled = function(enabled) {
+  const id = localStorage.getItem(CURRENT_AUDIT_ID_KEY);
+  const record = id ? getHistory().find(x => x.id === id) : null;
+  const allowed = enabled && (!record || canEditAudit(record));
+
+  document.querySelectorAll(
+    '#datos input, #datos select, #checklist input, #checklist select, #checklist textarea, #checklist button'
+  ).forEach(el => {
+    if (el.id === 'buscar' || el.id === 'filtro') return;
+    el.disabled = !allowed;
+  });
+
+  ['guardarHistorial', 'marcarEnviada'].forEach(idBtn => {
+    const btn = document.getElementById(idBtn);
+    if (btn) btn.disabled = !allowed;
+  });
+};
+
+/* Refuerza la habilitación al entrar a una nueva auditoría */
+const oldCrearAuditoriaLimpiaV12 = crearAuditoriaLimpiaV11;
+crearAuditoriaLimpiaV11 = function() {
+  oldCrearAuditoriaLimpiaV12();
+  setTimeout(() => setEditingEnabled(true), 0);
+};
+
+
+/* ===== V14: gráficos de resultados ===== */
+function chartHistoryData() {
+  return getHistory()
+    .filter(r => Number.isFinite(Number(r.porcentaje)))
+    .map(r => ({
+      ...r,
+      porcentaje: Number(r.porcentaje || 0),
+      clasificacion: r.clasificacion || clasificarResultado(Number(r.porcentaje || 0)).estado
+    }));
+}
+
+function prepareCanvas(id) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return null;
+  const rect = canvas.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+  const width = Math.max(320, Math.floor(rect.width || canvas.width));
+  const height = Math.max(240, Math.floor(rect.height || canvas.height));
+  canvas.width = width * ratio;
+  canvas.height = height * ratio;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+  return {canvas, ctx, width, height};
+}
+
+function drawEmptyChart(target, message='No hay auditorías guardadas') {
+  if (!target) return;
+  const {ctx,width,height}=target;
+  ctx.fillStyle='#f5f8f6';
+  ctx.fillRect(0,0,width,height);
+  ctx.fillStyle='#65736c';
+  ctx.font='600 15px Arial';
+  ctx.textAlign='center';
+  ctx.fillText(message,width/2,height/2);
+}
+
+function drawDonutChart() {
+  const target=prepareCanvas('chartClasificacion');
+  if(!target) return;
+  const data=chartHistoryData();
+  if(!data.length){drawEmptyChart(target);return}
+
+  const counts={
+    'BUENO':data.filter(x=>x.clasificacion==='BUENO').length,
+    'REGULAR':data.filter(x=>x.clasificacion==='REGULAR').length,
+    'POR MEJORAR':data.filter(x=>x.clasificacion==='POR MEJORAR').length
+  };
+  const palette={'BUENO':'#28a745','REGULAR':'#f2c230','POR MEJORAR':'#d93636'};
+  const total=data.length;
+  const {ctx,width,height}=target;
+  const cx=width/2,cy=height/2-5,r=Math.min(width,height)*.31;
+  let angle=-Math.PI/2;
+
+  Object.entries(counts).forEach(([key,val])=>{
+    const slice=(val/total)*Math.PI*2;
+    if(slice<=0)return;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,angle,angle+slice);
+    ctx.closePath();
+    ctx.fillStyle=palette[key];
+    ctx.fill();
+    angle+=slice;
+  });
+
+  ctx.beginPath();
+  ctx.arc(cx,cy,r*.56,0,Math.PI*2);
+  ctx.fillStyle='#fff';
+  ctx.fill();
+
+  ctx.fillStyle='#0f4c3a';
+  ctx.textAlign='center';
+  ctx.font='800 28px Arial';
+  ctx.fillText(total,cx,cy);
+  ctx.font='12px Arial';
+  ctx.fillText('auditorías',cx,cy+20);
+
+  const legend=document.getElementById('legendClasificacion');
+  if(legend){
+    legend.innerHTML=Object.entries(counts).map(([k,v])=>
+      `<span><i style="background:${palette[k]}"></i>${k}: <b>${v}</b></span>`
+    ).join('');
+  }
+}
+
+function groupedAverage(items,keySelector,valueSelector) {
+  const groups={};
+  items.forEach(item=>{
+    const key=String(keySelector(item)||'Sin dato');
+    if(!groups[key]) groups[key]=[];
+    groups[key].push(Number(valueSelector(item)||0));
+  });
+  return Object.entries(groups).map(([label,values])=>({
+    label,
+    value:values.reduce((a,b)=>a+b,0)/values.length,
+    count:values.length
+  })).sort((a,b)=>b.value-a.value);
+}
+
+function drawBarChart(canvasId,rows,options={}) {
+  const target=prepareCanvas(canvasId);
+  if(!target)return;
+  if(!rows.length){drawEmptyChart(target);return}
+  const {ctx,width,height}=target;
+  const pad={l:55,r:22,t:25,b:70};
+  const plotW=width-pad.l-pad.r;
+  const plotH=height-pad.t-pad.b;
+  const max=options.max||100;
+
+  ctx.strokeStyle='#d6e0db';
+  ctx.fillStyle='#66736d';
+  ctx.font='11px Arial';
+  ctx.textAlign='right';
+  for(let y=0;y<=100;y+=20){
+    const py=pad.t+plotH-(y/max)*plotH;
+    ctx.beginPath();ctx.moveTo(pad.l,py);ctx.lineTo(width-pad.r,py);ctx.stroke();
+    ctx.fillText(y+'%',pad.l-7,py+4);
+  }
+
+  const gap=12;
+  const bw=Math.max(22,(plotW-gap*(rows.length+1))/rows.length);
+  rows.forEach((row,i)=>{
+    const x=pad.l+gap+i*(bw+gap);
+    const bh=Math.max(1,(row.value/max)*plotH);
+    const y=pad.t+plotH-bh;
+    ctx.fillStyle=row.value>=94?'#28a745':row.value>=80?'#f2c230':'#d93636';
+    ctx.fillRect(x,y,bw,bh);
+    ctx.fillStyle='#183128';
+    ctx.textAlign='center';
+    ctx.font='700 11px Arial';
+    ctx.fillText(row.value.toFixed(1)+'%',x+bw/2,y-7);
+    ctx.save();
+    ctx.translate(x+bw/2,height-15);
+    ctx.rotate(-.45);
+    ctx.font='11px Arial';
+    ctx.fillText(row.label,0,0);
+    ctx.restore();
+  });
+
+  const goalY=pad.t+plotH-(94/max)*plotH;
+  ctx.setLineDash([7,5]);
+  ctx.strokeStyle='#0f4c3a';
+  ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(pad.l,goalY);ctx.lineTo(width-pad.r,goalY);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#0f4c3a';
+  ctx.textAlign='left';
+  ctx.font='700 11px Arial';
+  ctx.fillText('Meta 94%',pad.l+5,goalY-6);
+}
+
+function drawTrendChart() {
+  const target=prepareCanvas('chartTendencia');
+  if(!target)return;
+  const data=chartHistoryData().slice().sort((a,b)=>
+    String(a.fecha||a.creadoEn||'').localeCompare(String(b.fecha||b.creadoEn||''))
+  ).slice(-15);
+  if(!data.length){drawEmptyChart(target);return}
+
+  const {ctx,width,height}=target;
+  const pad={l:55,r:25,t:28,b:72};
+  const plotW=width-pad.l-pad.r,plotH=height-pad.t-pad.b;
+
+  ctx.strokeStyle='#d6e0db';ctx.fillStyle='#66736d';ctx.font='11px Arial';ctx.textAlign='right';
+  for(let y=0;y<=100;y+=20){
+    const py=pad.t+plotH-(y/100)*plotH;
+    ctx.beginPath();ctx.moveTo(pad.l,py);ctx.lineTo(width-pad.r,py);ctx.stroke();
+    ctx.fillText(y+'%',pad.l-7,py+4);
+  }
+
+  const goalY=pad.t+plotH-.94*plotH;
+  ctx.setLineDash([8,5]);ctx.strokeStyle='#d93636';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(pad.l,goalY);ctx.lineTo(width-pad.r,goalY);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#d93636';ctx.textAlign='left';ctx.fillText('Meta 94%',pad.l+5,goalY-7);
+
+  const step=data.length>1?plotW/(data.length-1):0;
+  const points=data.map((r,i)=>({
+    x:pad.l+i*step,
+    y:pad.t+plotH-(r.porcentaje/100)*plotH,
+    row:r
+  }));
+
+  ctx.strokeStyle='#137a57';ctx.lineWidth=3;ctx.beginPath();
+  points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+  ctx.stroke();
+
+  points.forEach(p=>{
+    ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);
+    ctx.fillStyle=p.row.porcentaje>=94?'#28a745':p.row.porcentaje>=80?'#f2c230':'#d93636';
+    ctx.fill();
+    ctx.fillStyle='#183128';ctx.textAlign='center';ctx.font='700 10px Arial';
+    ctx.fillText(p.row.porcentaje.toFixed(1),p.x,p.y-10);
+    ctx.save();ctx.translate(p.x,height-15);ctx.rotate(-.45);
+    ctx.font='10px Arial';
+    ctx.fillText((p.row.granja||'')+' '+(p.row.fecha||''),0,0);ctx.restore();
+  });
+}
+
+function drawGalponChart() {
+  const history=chartHistoryData();
+  const values=[];
+  history.forEach(r=>{
+    (r.resultadosGalpones||[]).forEach(g=>{
+      if(g.numero!==undefined && Number.isFinite(Number(g.porcentaje))){
+        values.push({numero:String(g.numero),porcentaje:Number(g.porcentaje)});
+      }
+    });
+  });
+  const rows=groupedAverage(values,x=>'Galpón '+x.numero,x=>x.porcentaje).slice(0,15);
+  drawBarChart('chartGalpones',rows);
+}
+
+function renderCharts() {
+  const data=chartHistoryData();
+  const avg=data.length?data.reduce((a,b)=>a+b.porcentaje,0)/data.length:0;
+  const good=data.filter(x=>x.porcentaje>=94).length;
+  const below=data.filter(x=>x.porcentaje<94).length;
+
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val};
+  set('chartTotal',data.length);
+  set('chartAverage',avg.toFixed(1)+'%');
+  set('chartGood',good);
+  set('chartBelowGoal',below);
+
+  drawDonutChart();
+  drawBarChart(
+    'chartAuditores',
+    groupedAverage(data,x=>x.auditor||'Sin auditor',x=>x.porcentaje).slice(0,12)
+  );
+  drawTrendChart();
+  drawGalponChart();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('actualizarGraficos')?.addEventListener('click',renderCharts);
+  document.querySelectorAll('nav button[data-tab="graficos"]').forEach(btn=>{
+    btn.addEventListener('click',()=>setTimeout(renderCharts,20));
+  });
+  window.addEventListener('resize',()=>{
+    const graphTab=document.getElementById('graficos');
+    if(graphTab?.classList.contains('active')) renderCharts();
+  });
+});
