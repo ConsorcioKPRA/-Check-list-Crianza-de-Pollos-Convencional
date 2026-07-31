@@ -1,1 +1,3 @@
-Abra index.html para revisar el prototipo. Para que el modo PWA funcione completamente, publique esta carpeta en un hosting HTTPS o use un servidor local. Los datos se guardan en el navegador.
+Versión V4 para GitHub Pages.
+Incluye listas desplegables de supervisor, campaña, auditor(a), visita, tipo de galpón, almacenamiento local, fotos, PDF e historial local de auditorías.
+Suba todos los archivos a la raíz del repositorio y active GitHub Pages desde main / root.
