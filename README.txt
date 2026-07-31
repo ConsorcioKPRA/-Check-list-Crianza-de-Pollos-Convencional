@@ -1,18 +1,10 @@
-CHECK LIST CRIANZA CONVENCIONAL - V10
+CHECK LIST V11 CORREGIDO
 
-CÁLCULO
-- Porcentaje por galpón = Cumple / (Cumple + No cumple) × 100.
+- La auditoría nueva pertenece al usuario que inicia sesión.
+- El auditor responsable puede guardar y marcar como enviada su auditoría.
+- Otros auditores solo pueden verla.
+- El administrador puede editar todas.
+- Porcentaje por galpón = Cumple / (Cumple + No cumple) x 100.
 - No aplica no se califica.
-- Resultado final = promedio de los porcentajes de los galpones evaluados.
-
-CLASIFICACIÓN
-- 94 % o más: BUENO.
-- 80 % a 93.99 %: REGULAR.
-- Menor de 80 %: POR MEJORAR.
-- Meta corporativa: 94 %.
-
-El resumen y PDF incluyen:
-- Resultado de cada galpón.
-- Promedio final.
-- Clasificación.
-- Mensaje automático del auditor.
+- Resultado final = promedio de porcentajes por galpón.
+- >=94 % BUENO; >=80 % REGULAR; <80 % POR MEJORAR.

@@ -115,3 +115,5 @@ button:disabled,input:disabled,select:disabled,textarea:disabled{opacity:.65;cur
   .final-result-card{break-inside:avoid;border:1px solid #999}
   .average-number{font-size:28px}
 }
+
+#pct{font-size:30px}.summary-classification{font-size:15px;font-weight:700;border-left:5px solid #137a57}
