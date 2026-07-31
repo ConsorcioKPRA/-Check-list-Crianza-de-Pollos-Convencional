@@ -1,7 +1,30 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0f4c3a"><title>Auditoría Crianza Convencional</title><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css"></head><body>
-<header class="app-header"><div class="brand"><img src="logo-santa-elena.png" alt="Santa Elena" class="brand-logo"><div><h1>Check List de Crianza de Pollos Convencional</h1><p>Auditoría por galpones · funciona sin conexión</p></div></div><span id="net" class="badge">Verificando…</span></header>
-<nav><button data-tab="datos" class="active">1. Datos</button><button data-tab="checklist">2. Checklist</button><button data-tab="resumen">3. Resumen/PDF</button><button data-tab="historial">4. Historial</button></nav>
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <img src="logo-santa-elena.png" alt="Santa Elena" class="login-logo">
+    <h2>Ingreso al sistema</h2>
+    <p>Check List de Crianza de Pollos Convencional</p>
+    <label>Usuario
+      <input id="loginUsuario" autocomplete="username" placeholder="Ingrese su usuario">
+    </label>
+    <label>Contraseña
+      <input id="loginClave" type="password" autocomplete="current-password" placeholder="Ingrese su contraseña">
+    </label>
+    <button id="btnIngresar" class="primary login-button">Ingresar</button>
+    <p id="loginError" class="login-error" aria-live="polite"></p>
+  </div>
+</div>
+
+<div id="appContainer" class="app-hidden">
+
+<header class="app-header"><div class="brand"><img src="logo-santa-elena.png" alt="Santa Elena" class="brand-logo"><div><h1>Check List de Crianza de Pollos Convencional</h1><p>Auditoría por galpones · funciona sin conexión</p></div></div>
+<div class="header-actions">
+  <span id="usuarioActivo" class="user-badge"></span>
+  <span id="net" class="badge">Verificando…</span>
+  <button id="cerrarSesion" class="logout-btn" type="button">Cerrar sesión</button>
+</div></header>
+<nav><button data-tab="datos" class="active">1. Datos</button><button data-tab="checklist">2. Checklist</button><button data-tab="resumen">3. Resumen/PDF</button></nav>
 <main>
 <section id="datos" class="tab active">
 <div class="card"><h2>Datos generales</h2><div class="grid general-grid">
@@ -9,7 +32,7 @@
 <label>Granja<input id="granja" placeholder="Nombre de la granja"></label>
 <label>Supervisor<select id="supervisor"><option value="">Seleccione</option><option>Miguel Apolinario</option><option>Christian Perez</option><option>Andres Vera</option><option>Cristian Tarazona</option><option>Julio Jesus</option><option>Jonathan Huancahuari</option><option>Jose Quispe</option><option>Jim Alvarez</option><option>Elder Padilla</option></select></label>
 <label>Campaña<select id="campana"><option value="">Seleccione</option><option>2025-5</option><option>2025-6</option><option>2026-1</option><option>2026-2</option><option>2026-3</option><option>2026-4</option><option>2026-5</option><option>2026-6</option><option>2026-7</option></select></label>
-<label>Auditor(a)<select id="auditor"><option value="">Seleccione</option><option>Monica</option><option>Mariluz</option><option>William</option><option>Harold</option><option>Diego</option><option>Pamela</option></select></label>
+<label>Auditor(a)<select id="auditor" disabled><option value="">Seleccione</option><option>Monica</option><option>Mariluz</option><option>William</option><option>Harold</option><option>Diego</option><option>Pamela</option></select></label>
 <label>Visita<select id="visita"><option value="">Seleccione</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
 </div></div>
 <div class="card"><h2>Datos de los galpones</h2><p class="note">Escriba el número real de cada galpón. Estos números aparecerán automáticamente en todas las preguntas.</p>
@@ -22,6 +45,5 @@
 </tbody></table></div>
 <div class="actions"><button id="guardarDatos" class="primary">Guardar y continuar</button><button id="nuevo" class="danger">Nueva auditoría</button></div></div></section>
 <section id="checklist" class="tab"><div class="toolbar"><input id="buscar" placeholder="Buscar ítem, detalle o criterio"><select id="filtro"><option value="">Todos</option><option>CUMPLE</option><option>NO CUMPLE</option><option>NO APLICA</option><option value="PENDIENTE">Pendientes</option></select><span id="avance"></span></div><div id="lista"></div></section>
-<section id="resumen" class="tab"><div class="card"><div class="report-title"><div><h2>Informe de auditoría</h2><p>Check List de Crianza de Pollos Convencional</p></div><img src="logo-santa-elena.png" alt="Santa Elena" class="report-logo"></div><div id="resumenDatos"></div><div class="kpis"><div><b id="pct">0%</b><span>Cumplimiento</span></div><div><b id="cumple">0</b><span>Cumple</span></div><div><b id="nocumple">0</b><span>No cumple</span></div><div><b id="pendientes">0</b><span>Pendientes</span></div></div><div id="desviaciones"></div><div class="actions"><button id="guardarHistorial" class="primary">Guardar auditoría en historial</button><button id="imprimir" class="primary">Descargar / imprimir PDF</button><button id="exportar">Exportar respaldo</button><label class="filebtn">Importar respaldo<input id="importar" type="file" accept="application/json"></label><button id="correo">Preparar correo</button></div><p class="note">Los datos y fotos se guardan localmente. Use “Exportar respaldo” para evitar pérdidas.</p></div></section>
-<section id="historial" class="tab"><div class="card"><h2>Historial local de auditorías</h2><p class="note">Estas auditorías se guardan en este navegador. Más adelante esta misma estructura se conectará a la nube.</p><div class="toolbar historial-toolbar"><input id="buscarHistorial" placeholder="Buscar por granja, campaña, supervisor o auditor"><button id="exportarHistorial">Exportar todo</button></div><div id="historialLista"></div></div></section>
-</main><footer>Aplicativo editable de auditoría de crianza convencional.</footer><script src="app.js"></script></body></html>
+<section id="resumen" class="tab"><div class="card"><div class="report-title"><div><h2>Informe de auditoría</h2><p>Check List de Crianza de Pollos Convencional</p></div><img src="logo-santa-elena.png" alt="Santa Elena" class="report-logo"></div><div id="resumenDatos"></div><div class="kpis"><div><b id="pct">0%</b><span>Cumplimiento</span></div><div><b id="cumple">0</b><span>Cumple</span></div><div><b id="nocumple">0</b><span>No cumple</span></div><div><b id="pendientes">0</b><span>Pendientes</span></div></div><div id="desviaciones"></div><div class="actions"><button id="imprimir" class="primary">Descargar / imprimir PDF</button><button id="exportar">Exportar respaldo</button><label class="filebtn">Importar respaldo<input id="importar" type="file" accept="application/json"></label><button id="correo">Preparar correo</button></div><p class="note">Los datos y fotos se guardan localmente. Use “Exportar respaldo” para evitar pérdidas.</p></div></section>
+</main><footer>Aplicativo editable de auditoría de crianza convencional.</footer></div><script src="app.js"></script></body></html>
